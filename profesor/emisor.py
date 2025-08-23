@@ -1,31 +1,40 @@
 from microbit import *
 import radio
 
-# Activamos el radio
+# Encender radio y configurar grupo
 radio.on()
-# Configuramos un grupo para que solo ciertos micro:bits se comuniquen
 radio.config(group=1)
-message = ""
+
+# Inicializar UART
+uart.init(baudrate=115200)
 
 while True:
-    # Verificamos si hay datos disponibles en el puerto serial
+    # --- UART → RADIO --- UART (Universal Asynchronous Receiver/Transmitter)
     if uart.any():
-        # Leemos los datos del puerto serial
         serial_data = uart.readline()
-        # Convertimos los datos a string y eliminamos caracteres de nueva línea
         if serial_data:
             message = serial_data.decode('utf-8').strip()
             
-            # Enviamos el mensaje recibido por radio
+            # Enviar al alumno por radio
             radio.send(message)
             
-            # Mostramos una indicación visual de que se envió el mensaje
+            # Feedback visual
             display.show(Image.CHESSBOARD)
-            sleep(500)
+            sleep(300)
             display.clear()
             
-            # Opcional: mostrar el mensaje enviado en la pantalla
-            # display.scroll(message)
+            # Confirmación por UART
+            uart.write("Mensaje enviado: " + message + "\n")
     
-    # Pequeña pausa para no saturar el procesador
+    # --- RADIO → UART ---
+    msg = radio.receive()
+    if msg:
+        # Mostrar feedback visual
+        display.show(Image.YES)
+        sleep(300)
+        display.clear()
+
+        # Reenviar al navegador
+        uart.write("Respuesta alumno: " + msg + "\n")
+    
     sleep(100)
