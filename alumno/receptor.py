@@ -2,7 +2,7 @@ from microbit import *
 import radio
 
 radio.on()
-radio.config(group=1)
+radio.config(group=1, power=7)
 
 # Variable para guardar si hay que enviar temperatura
 enviar_temperatura = False
@@ -15,14 +15,11 @@ while True:
         sleep(500)
         display.clear()
 
-        parts = msg.split("|")
-        if len(parts) == 3:
-            sensor, premisa, nivel = parts
-            display.scroll("Sensor:" + sensor)
-            display.scroll("Nivel:" + nivel)
-
+        if msg:
+            display.show(Image.HAPPY)
+            
             # Si el sensor es temperatura, activamos flag
-            if sensor.lower() == "temperatura":
+            if msg.lower() == "temperatura":
                 
                 enviar_temperatura = True
             else:
@@ -30,11 +27,23 @@ while True:
         else:
             display.scroll(msg)  # fallback si el formato no coincide
 
-    # --- Botón A para enviar temperatura ---
-    if enviar_temperatura and button_a.is_pressed():
-        temp = temperature()  # función de micro:bit que devuelve temperatura en °C
-        radio.send(str(temp))
+    values = []
+    detectando = False
+    if enviar_temperatura and button_a.was_pressed():
+        detectando = True
+        while detectando:
+            if button_a.was_pressed():
+                # --- Botón A para enviar temperatura ---
+                temp = temperature()  # función de micro:bit que devuelve temperatura en °C
+                display.scroll(temp)
+                values.append(temp)
+                
+            if button_b.was_pressed():
+                detectando = False
+                
+        radio.on()
+        radio.config(group=1, power=7)     
+        radio.send(str(values))
         display.show(Image.TARGET)
-        sleep(500)
         display.clear()
         enviar_temperatura = False  # solo enviamos una vez por presión
