@@ -3,7 +3,7 @@ import radio
 
 # Encender radio y configurar grupo
 radio.on()
-radio.config(group=1)
+radio.config(group=1,power=7)
 
 # Inicializar UART
 uart.init(baudrate=115200)
@@ -22,10 +22,6 @@ while True:
             display.show(Image.CHESSBOARD)
             sleep(300)
             display.clear()
-            
-            # Confirmación por UART
-            uart.write("Mensaje enviado: " + message + "\n")
-    
     # --- RADIO → UART ---
     msg = radio.receive()
     if msg:
@@ -35,6 +31,6 @@ while True:
         display.clear()
 
         # Reenviar al navegador
-        uart.write("Respuesta alumno: " + msg + "\n")
+        uart.write(msg + "\n")
     
     sleep(100)
