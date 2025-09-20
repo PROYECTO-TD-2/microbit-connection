@@ -5,6 +5,7 @@ import radio
 from sensor_temperatura import SensorTemperatura
 from sensor_luz import SensorLuz
 from sensor_acelerometro import SensorAcelerometro
+from sensor_sonido import SensorSonido
 
 radio.on()
 radio.config(group=1, power=7)
@@ -13,7 +14,8 @@ radio.config(group=1, power=7)
 strategies = {
     "temperatura": SensorTemperatura(),
     "luz": SensorLuz(),
-    "acelerometro": SensorAcelerometro()
+    "acelerometro": SensorAcelerometro(),
+    "sonido": SensorSonido()
 }
 
 # Variable de sensor activo
